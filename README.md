@@ -56,18 +56,17 @@ To run the Ayurveda AI Chatbot locally, follow these steps:
 
 2. Install the required dependencies:
    ```
-   cd ayurveda-ai-chatbot
+   create a virtual environment: python -m venv ayurbotEnv
    pip install -r requirements.txt
    ```
 
 3. Set up the necessary environment variables:
-   - `OPENAI_API_KEY`: Your OpenAI API key for accessing the language model
-   - `PINECONE_API_KEY`: Your Pinecone API key for semantic search
-   - `PINECONE_ENV`: The Pinecone environment for your indexes
+   - `ollama`: Install ollama on your device. (https://ollama.com/)
+   - `llama3.2`: Install llama3.2, by running this command in cmd. "ollama pull llama3.2"
 
 4. Run the chatbot:
    ```
-   python app.py
+   python main.py
    ```
 
 5. Access the chatbot through the provided URL or interface.
