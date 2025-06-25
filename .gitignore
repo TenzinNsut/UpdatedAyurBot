@@ -1,3 +1,4 @@
-ayurbotEnv/
+creditCardEnv/
 __pycache__
 tmp/
+.env

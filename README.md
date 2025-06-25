@@ -1,82 +1,91 @@
-# Ayurveda AI Chatbot
-
-https://github.com/TenzinNsut/AyurvedaChatbot/assets/105097758/f7945a94-117f-4305-a97d-e490af9c310b
-
-![diagram-export-17-5-2024-9_14_42-am](https://github.com/TenzinNsut/AyurvedaChatbot/assets/105097758/a9c692ae-df0e-49e6-9033-e7b665fe6ccc)
+# AyurBot: AI-Powered Ayurveda Chatbot
 
 ## Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Models & Technologies Used](#models--technologies-used)
 
 ## Introduction
-This project aims to develop an interactive chatbot system that can provide information on Ayurvedic treatments for various skin diseases. By leveraging natural language processing (NLP), semantic search, and large language models (LLMs), the chatbot enables users to ask questions about skin conditions and retrieve relevant answers extracted from an authoritative Ayurvedic reference book.
-The core components of the chatbot include:
+AyurBot is an interactive AI-powered chatbot designed to provide users with practical, friendly, and easy-to-understand advice on Ayurveda and holistic wellness. Leveraging Retrieval-Augmented Generation (RAG), semantic search, and large language models (LLMs), AyurBot analyzes user queries and retrieves relevant information from a curated knowledge base of Ayurvedic texts and resources.
 
-- A knowledge base containing chunks of text from the reference book
-- Embedding and semantic indexing of the text chunks
-- Pinecone, a cloud database for storing and similarity searching of the vectorized data
-- A query embedding and search module to find the most relevant chunks
-- An LLM for answer refinement and generalized responses
+The core components of AyurBot include:
+- A knowledge base built from authentic Ayurvedic documents (e.g., medical books in PDF format)
+- Embedding and semantic indexing of the knowledge base for efficient search
+- Pinecone, a cloud vector database for similarity search
+- A query embedding and search module to find the most relevant information
+- An LLM for generating clear, actionable, and engaging responses
 
 ## System Overview and Methodology
 
-## 2.1 Knowledge Base Creation
-The first step involves extracting the text content from an Ayurvedic book focused on skin diseases. Since the book's content is extensive and exceeds the token limit of most LLMs, the text is divided into smaller chunks. This chunking process allows the subsequent components to process the data more efficiently.
+### 1. Knowledge Base Creation
+Text content is extracted from Ayurvedic documents (PDFs) and split into manageable chunks for efficient processing using LangChain utilities.
 
-## 2.2 Embedding and Semantic Indexing
-To enable semantic similarity matching, the text chunks are converted into vector representations using an embedding model. Each chunk is transformed into a high-dimensional vector that captures its semantic meaning. These vector embeddings are then stored in Pinecone, a cloud database designed for efficient similarity search and retrieval.
+### 2. Embedding and Semantic Indexing
+Text chunks are converted into vector representations using a state-of-the-art embedding model. These vectors are stored in Pinecone for fast similarity search.
 
-## 2.3 User Query Processing
-When a user submits a question to the chatbot, the query undergoes the same embedding process as the knowledge base chunks. The vectorized query is then used to perform a similarity search against the indexed chunks in Pinecone. Pinecone calculates the similarity scores between the query vector and the stored chunk vectors, identifying the most semantically relevant chunks.
+### 3. User Query Processing
+User queries are embedded and matched against the indexed knowledge base to find the most relevant information.
 
-## 2.4 Answer Retrieval and Refinement
-The chunks with the highest similarity scores are retrieved from Pinecone and ranked based on their relevance to the user's query. The top-ranked chunk is considered the most appropriate answer. However, to enhance the coherence and naturalness of the response, the selected chunk is passed through an LLM, specifically the Llama model from Meta. The LLM refines the answer, ensuring a more human-like and contextually appropriate response.
-In cases where the user's query does not have an exact match in the knowledge base, the LLM generates a generalized response based on the available information. This fallback mechanism ensures that the chatbot provides a satisfactory response even when faced with queries that are not directly addressed in the reference book.
-
-## Conclusion
-The Ayurveda chatbot developed in this project demonstrates the effective integration of NLP techniques, semantic search, and LLMs to create an interactive information retrieval system. By leveraging a comprehensive Ayurvedic book on skin diseases as the knowledge base, the chatbot enables users to access relevant information quickly and easily.
-The combination of text chunking, embedding, semantic indexing, and LLM-based answer refinement allows the chatbot to provide accurate and naturalistic responses to user queries. The use of Pinecone as the cloud database for storing and searching vectorized data ensures efficient retrieval of the most relevant chunks.
+### 4. Answer Retrieval and Generation
+Relevant chunks are retrieved and passed to a large language model, which generates a concise, user-friendly, and engaging response based on the user's question and the retrieved context.
 
 ## Features
+- Friendly, conversational Ayurveda assistant (AyurBot)
 - Natural language understanding and processing
-- Semantic search for relevant information retrieval
-- Integration with a comprehensive Ayurvedic knowledge base 
-- Generative responses using Llama2 a large language model
-- User-friendly interface for seamless interaction
+- Semantic search for relevant information retrieval from Ayurvedic texts
+- Generative, actionable responses using a large language model
+- User-friendly web interface with real-time chat
+- Engaging responses with emojis and practical advice
 
 ## Installation
-To run the Ayurveda AI Chatbot locally, follow these steps:
+To run AyurBot locally, follow these steps:
 
 1. Clone the repository:
    ```
-   git clone https://github.com/your-username/ayurveda-ai-chatbot.git
+   git clone <your-repo-url>
    ```
 
 2. Install the required dependencies:
    ```
-   create a virtual environment: python -m venv ayurbotEnv
+   # Create a virtual environment (optional but recommended)
+   python -m venv ayurbotEnv
+   # Activate the environment and install dependencies
    pip install -r requirements.txt
    ```
 
-3. Set up the necessary environment variables:
-   - `ollama`: Install ollama on your device. (https://ollama.com/)
-   - `llama3.2`: Install llama3.2, by running this command in cmd. "ollama pull llama3.2"
+3. Set up the necessary environment variables in a `.env` file:
+   - `PINECONE_API_KEY` and `PINECONE_ENV`: For Pinecone vector database access
+   - `HUGGINGFACE_API_KEY`: For HuggingFace Inference Endpoint access
 
-4. Run the chatbot:
+4. Index the documents (if not already indexed):
+   ```
+   python index_documents.py
+   ```
+
+5. Run the application:
    ```
    python main.py
    ```
 
-5. Access the chatbot through the provided URL or interface.
+6. Access the web interface through the provided URL (default: http://localhost:8080).
 
 ## Usage
-To interact with the Ayurveda AI Chatbot, simply enter your query or question related to Ayurvedic treatments for skin diseases. The chatbot will process your input, retrieve relevant information from its knowledge base, and provide a personalized response.
+Interact with AyurBot by typing your questions about Ayurveda, such as:
+- "What are the best herbs for immunity?"
+- "Suggest Ayurvedic remedies for stress."
+- "Explain the three doshas."
+- "What is a good Ayurvedic diet for Pitta body type?"
 
-You can ask questions like:
-- "What are some Ayurvedic remedies for eczema?"
-- "How can I use neem to treat acne?"
-- "What dietary recommendations does Ayurveda suggest for healthy skin?"
+AyurBot will analyze your query, retrieve relevant information from its knowledge base, and provide a friendly, practical, and engaging response.
 
-The chatbot will analyze your query and provide accurate and informative responses based on Ayurvedic principles and knowledge.
+## Models & Technologies Used
+- **Embedding Model:** [`BAAI/bge-large-en-v1.5`](https://huggingface.co/BAAI/bge-large-en-v1.5) (HuggingFace)
+- **LLM:** [`Qwen/Qwen3-32B`](https://huggingface.co/Qwen/Qwen3-32B) (HuggingFace Inference Endpoint)
+- **Vector Database:** [Pinecone](https://www.pinecone.io/)
+- **Frameworks/Libraries:** Flask, LangChain, dotenv, sentence-transformers, PyPDF
+
+---
+
+AyurBot makes Ayurveda accessible, engaging, and easy to explore. For any questions or contributions, please open an issue or pull request!

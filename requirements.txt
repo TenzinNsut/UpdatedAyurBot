@@ -1,6 +1,10 @@
 langchain
 langchain-community
-langchain_ollama
+sentence-transformers
 pypdf
-langchain-qdrant    
 flask
+langchain-pinecone
+python-dotenv
+langchain-huggingface
+pinecone
+

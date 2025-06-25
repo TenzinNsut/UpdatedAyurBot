@@ -1,40 +1,89 @@
-from langchain_ollama import OllamaEmbeddings
-from langchain_core.vectorstores import VectorStoreRetriever
-from langchain.chains import create_retrieval_chain
-from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_ollama import ChatOllama
-from langchain_qdrant import QdrantVectorStore
+# Import necessary modules
+import os
+from dotenv import load_dotenv
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_pinecone import PineconeVectorStore
+from pinecone import Pinecone
+from huggingface_hub import InferenceClient
+
+import re
+
+# Load environment variables
+load_dotenv()
 
 
-def generateResponse(data,userQuery):
-    embedding_model = OllamaEmbeddings(model="llama3.2") 
-    qdrant = QdrantVectorStore.from_documents(
-    documents=data,
-    embedding=embedding_model,
-    path="./tmp/local_qdrant",
-    collection_name="pdf_data",
-    force_recreate = "true"
+# Function to generate bot response
+def generateResponse(userQuery):
+    
+    # ✅ Simple greetings detection
+    greetings = ["hi", "hello", "hey", "namaste", "hii", "hai"]
+    if userQuery.lower().strip() in greetings:
+        return (
+            "👋 Hi there! I'm **AyurBot**, your friendly assistant for Ayurveda and holistic wellness.\n"
+            "Ask me anything about remedies, herbs, diet, body types, or general health!"
+        )
+
+    # ✅ Set up embedding model for document search
+    embedding_model = HuggingFaceEmbeddings(
+        model_name="BAAI/bge-large-en-v1.5",
+        model_kwargs={'device': 'cpu'}
     )
-    retriever = qdrant.as_retriever()
-    llm = ChatOllama(model="llama3.2")
-    query = userQuery
+
+    # ✅ Set up Pinecone vector store
+    index_name = "ayur-index"
+    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+    index = pc.Index(index_name)
+
+    vectorstore = PineconeVectorStore(
+        index=index,
+        embedding=embedding_model
+    )
+    retriever = vectorstore.as_retriever()
+
+    print(f"User Query: {userQuery}")
+
+    # ✅ Retrieve relevant context from documents
+    docs = retriever.get_relevant_documents(userQuery)
+    context_text = "\n".join([doc.page_content for doc in docs]) if docs else "No context found."
+
+
     system_prompt = (
-    "You are a helpful AI assistant called AyuBuddy, you specialize in answer ayurveda related questions."
-    "Use the given context to answer the question. "
-    "If you don't know the answer, say you don't know. "
-    "Use three sentence maximum and keep the answer concise. "
-    "Context: {context}"
+    "You are 'AyurBot', a friendly and knowledgeable Ayurveda assistant.\n\n"
+    "🎯 Your job is to provide helpful, practical, and easy-to-understand Ayurvedic advice with a warm, approachable tone.\n\n"
+    "✅ Vary your language and phrasing to avoid sounding repetitive or robotic.\n"
+    "✅ Use emojis naturally to make the response engaging (like 🌿 for herbs, 🚨 for warnings, 🌱 for remedies, etc.).\n"
+    "✅ Provide clear, actionable advice on Ayurveda — diet, herbs, remedies, body types (doshas), etc.\n"
+    "✅ You can organize information with bullet points, but always keep the tone friendly and conversational.\n"
+    "✅ DO NOT over-explain your reasoning or describe your thought process.\n"
+    "✅ Do NOT include system tags like '<think>', '<p>', etc. Keep the final response clean.\n"
+    "✅ If you lack context or can't answer, politely say: 'I'm sorry, I don't have that information right now.'\n\n"
+    "Here is some context from the user's question or documents:\n{context}\n\n"
+    "Based on that, reply naturally, clearly, and in a way that feels human and helpful. Vary your style, but keep it friendly and practical."
     )
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", system_prompt),
-        ("human", "{input}"),])
-    question_answer_chain = create_stuff_documents_chain(llm, prompt)
-    chain = create_retrieval_chain(retriever, question_answer_chain)
-
-    result = chain.invoke({"input": query})
-    print(result['answer'])
-    return result['answer']
 
 
 
+
+
+    # ✅ Raw HuggingFace InferenceClient for chat
+    client = InferenceClient(
+        provider="novita",
+        api_key=os.getenv("HUGGINGFACE_API_KEY")
+    )
+
+    completion = client.chat.completions.create(
+        model="Qwen/Qwen3-32B",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": userQuery}
+        ]
+    )
+
+    bot_response = completion.choices[0].message.content
+    
+    # bot_response = clean_bot_response(bot_response)
+    bot_response = re.sub(r"<think>.*?</think>", "", bot_response, flags=re.DOTALL).strip()
+
+    print(f"Bot Response: {bot_response}")
+
+    return bot_response
