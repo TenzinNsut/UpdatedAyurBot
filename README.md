@@ -1,5 +1,10 @@
 # AyurBot: AI-Powered Ayurveda Chatbot
 
+
+https://github.com/user-attachments/assets/cd21a27d-76d9-4cf5-8a76-f7f835db17f8
+
+
+
 ## Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)
