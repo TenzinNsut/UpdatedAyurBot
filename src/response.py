@@ -16,6 +16,7 @@ load_dotenv()
 def generateResponse(userQuery):
     
     # ✅ Simple greetings detection
+    print("generateResponse called with:", userQuery, flush=True)
     greetings = ["hi", "hello", "hey", "namaste", "hii", "hai"]
     if userQuery.lower().strip() in greetings:
         return (
@@ -23,17 +24,20 @@ def generateResponse(userQuery):
             "Ask me anything about remedies, herbs, diet, body types, or general health!"
         )
 
+    print("Setting up embedding model...", flush=True)
     # ✅ Set up embedding model for document search
     embedding_model = HuggingFaceEmbeddings(
         model_name="BAAI/bge-large-en-v1.5",
         model_kwargs={'device': 'cpu'}
     )
 
+    print("Setting up Pinecone...", flush=True)
     # ✅ Set up Pinecone vector store
     index_name = "ayur-index"
     pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
     index = pc.Index(index_name)
 
+    print("Setting up vectorstore...", flush=True)
     vectorstore = PineconeVectorStore(
         index=index,
         embedding=embedding_model
@@ -42,6 +46,7 @@ def generateResponse(userQuery):
 
     print(f"User Query: {userQuery}")
 
+    print("Retrieving relevant documents...", flush=True)
     # ✅ Retrieve relevant context from documents
     docs = retriever.get_relevant_documents(userQuery)
     context_text = "\n".join([doc.page_content for doc in docs]) if docs else "No context found."
