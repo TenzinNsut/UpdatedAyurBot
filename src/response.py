@@ -48,7 +48,8 @@ def generateResponse(userQuery):
 
     print("Retrieving relevant documents...", flush=True)
     # ✅ Retrieve relevant context from documents
-    docs = retriever.get_relevant_documents(userQuery)
+    # docs = retriever.get_relevant_documents(userQuery)
+    docs = retriever.invoke(userQuery)
     context_text = "\n".join([doc.page_content for doc in docs]) if docs else "No context found."
 
 
